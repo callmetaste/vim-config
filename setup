@@ -1,0 +1,5 @@
+echo "runtime vimrc" > ../.vimrc
+mv ../vim-config ../.vim
+
+
+
