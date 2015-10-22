@@ -3,5 +3,5 @@
 Installation
 ==
 
-chmod +x setup
-./setup
+$ chmod +x setup
+$ ./setup
