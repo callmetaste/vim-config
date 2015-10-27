@@ -1,6 +1,7 @@
 " autoload plugin stuff {{{
 runtime bundle/vim-pathogen/autoload/pathogen.vim
 execute pathogen#infect()
+let g:pymode_rope_autoimport=0
 " }}}
 
 " color {{{
@@ -8,13 +9,13 @@ syntax enable " enable syntax processing
 " }}}
 
 " spaces and tabs {{{
+syntax on " allows vim to highlight language syntax based on filetype
 set shiftwidth=4 " indenting is 4 spaces
 set tabstop=4 " number of visual spaces per TAB
 set expandtab " tabs are spaces
-syntax on
-set list listchars=tab:▷⋅,trail:⋅,nbsp:⋅
+set list listchars=tab:▷⋅,trail:⋅,nbsp:⋅ " highlights whitespace
 set statusline=%F%m%r%h%w\ [TYPE=%Y\ %{&ff}]\
-            \ [%l/%L]\ (%p%%)
+            \ [%l/%L]\ (%p%%) " detailed command bar
 "tab
 " for command mode
 nnoremap <S-Tab> <<
@@ -28,12 +29,22 @@ vnoremap <Tab> >
 " }}}
 
 " UI config {{{
-set number " show line numbers
-set showcmd " show command in bottom bar
-set cursorline " highlight current line
 filetype plugin indent on " load filetype-specific indent files
+set showcmd " show command in bottom bar
+set history=200 " a longer command history
 set wildmenu " visual autocomplete for command menu
-set lazyredraw " redraw only when we need
+" cursor
+set virtualedit=onemore " allows cursor beyond last char
+set scrolljump=7
+set scrolloff=5
+" readability
+set formatoptions=1 lbr " linewrapping
+set number " show line numbers
+set cursorline " highlight current line
+" set lazyredraw " redraw only when we need
+set wrap
+set colorcolumn=80 " column at 80
+" searching
 set showmatch " highlight matching {[()]}
 " }}}
 
@@ -46,16 +57,30 @@ noremap <leader>/ :nohlsearch<CR>
 
 " folding {{{
 set foldenable " enable folding
-set foldlevelstart=10 " open most folds by default
-" space open/closes folds
-" noremap <space> za
+set foldlevelstart=0 " open most folds by default
 set foldmethod=indent " fold based on indent level
+nmap <leader>f0 :set foldlevel=0<CR>>
+nmap <leader>f1 :set foldlevel=1<CR>>
+nmap <leader>f2 :set foldlevel=2<CR>>
+nmap <leader>f3 :set foldlevel=3<CR>>
+nmap <leader>f4 :set foldlevel=4<CR>>
+nmap <leader>f5 :set foldlevel=5<CR>>
+nmap <leader>f6 :set foldlevel=6<CR>>
+nmap <leader>f7 :set foldlevel=7<CR>>
+nmap <leader>f8 :set foldlevel=8<CR>>
+nmap <leader>f9 :set foldlevel=9<CR>>
+
+
+
 "}}} 
 
 " movement {{{
 " move vertically by visual line
 noremap j gj
 noremap k gk
+" move by line when given a movement
+onoremap j j
+onoremap k k
 " move to beginning/end of line
 noremap B ^
 noremap E $
@@ -68,16 +93,16 @@ nnoremap gV '[v']
 
 " <leader> bindings {{{
 " explicit mapping of <leader>= \  and <localleader>= ,
-let mapleader="\\" 
-let localmapleader="," ",
+let mapleader="\\"
+let maplocalleader=","
 "vimrc editing
 " toggle gundo
 nnoremap <leader>u :GundoToggle<CR>
 "edit vimrc and load vimrc bindings
 map <leader>ev :vsp $MYVIMRC <CR>
 map <F9> :vsplit ~/.vim/vimrc <CR>
-map <leader>wv :source $MYVIMRC <CR> :echo "NEW VIMRC LOADED!" <CR>
-map <F6> :so ~/.vimrc<CR> :echo "NEW VIMRC LOADED!" <CR>
+map <leader>wv :source $MYVIMRC <CR> :echom "NEW VIMRC LOADED!" <CR>
+map <F6> :so ~/.vimrc<CR> :echom "NEW VIMRC LOADED!" <CR>
 " save session
 nnoremap <leader>s :mksession <CR>
 " }}}
@@ -98,8 +123,8 @@ augroup vimrc_autocmd
     autocmd FileType tex              let b:comment_leader = '% '
     autocmd FileType mail             let b:comment_leader = '> '
     autocmd FileType vim              let b:comment_leader = '" '
-    noremap <silent> <localmapleader>c :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:nohlsearch<CR>
-    noremap <silent> <localmapleader>u :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:nohlsearch<CR>
+    noremap <silent> <localleader>c :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:nohlsearch<CR>
+    noremap <silent> <localleader>u :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:nohlsearch<CR>
     "python
     autocmd FileType python set autoindent
     autocmd FileType python set smartindent
@@ -131,17 +156,15 @@ augroup END
 set clipboard=unnamed " copy into system clipboard
 set backspace=indent,eol,start
 set gfn=Monospace\ 12 " font
-set colorcolumn=80 " column at 80
 
 set splitbelow
 set splitright
-nnoremap Y y$
 
 
 
 """"formatting""""
 map <leader><space> =ip
-map <leader><space>g gg=G :echo "Indenting whole file." <cr>
+map <leader><space>g gg=G :echom "Indenting whole file." <cr>
 
 
 "moving line up/down
