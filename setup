@@ -1,4 +1,5 @@
 echo "runtime vimrc" > ../.vimrc
+git submodule update --init --recursive ./bundle
 mv ../vim-config ../.vim
 
 

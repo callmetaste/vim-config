@@ -6,6 +6,7 @@ let g:pymode_rope_autoimport=0
 
 " color {{{
 syntax enable " enable syntax processing
+colorscheme badwolf
 " }}}
 
 " spaces and tabs {{{
@@ -42,6 +43,7 @@ set formatoptions=1 lbr " linewrapping
 set number " show line numbers
 set cursorline " highlight current line
 " set lazyredraw " redraw only when we need
+set ttyfast
 set wrap
 set colorcolumn=80 " column at 80
 " searching
@@ -103,6 +105,18 @@ map <leader>ev :vsp $MYVIMRC <CR>
 map <F9> :vsplit ~/.vim/vimrc <CR>
 map <leader>wv :source $MYVIMRC <CR> :echom "NEW VIMRC LOADED!" <CR>
 map <F6> :so ~/.vimrc<CR> :echom "NEW VIMRC LOADED!" <CR>
+" turn spelling on/off
+function! SpellToggle()
+    if(&spell==1) " currently enabled, set to disabled
+        echom "SPELL CHECK OFF"
+        set nospell
+    else " currently disabled, set to enable
+        echom "SPELL CHECK ON" 
+        setlocal spell spelllang=en_us
+    endif
+endfunc
+nnoremap <leader>= :call SpellToggle()<cr>
+
 " save session
 nnoremap <leader>s :mksession <CR>
 " }}}
@@ -111,6 +125,7 @@ nnoremap <leader>s :mksession <CR>
 augroup vimrc_autocmd
 " ensures commands are loaded only once
     autocmd!
+    " Implementation comments
     " au[tocmd] [group] {event} {patern} [nested] {cmd}
     " group = [aug[roup], ...] " examples: aug_new
     " event = [VimEnter, BufWritePre, FileType, BufEnter, ...]
@@ -125,6 +140,10 @@ augroup vimrc_autocmd
     autocmd FileType vim              let b:comment_leader = '" '
     noremap <silent> <localleader>c :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:nohlsearch<CR>
     noremap <silent> <localleader>u :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:nohlsearch<CR>
+    " Aligns comments
+    " "<C-R>" pastes the register while "=escape()" assigns the register a
+    " value
+    noremap <silent> <localleader><Tab> :Tab /<C-R>=escape(b:comment_leader,'\/')<CR><CR>
     "python
     autocmd FileType python set autoindent
     autocmd FileType python set smartindent
@@ -149,6 +168,7 @@ augroup vimrc_autocmd
 
     autocmd InsertEnter * :set number
     autocmd InsertLeave * :set relativenumber
+    autocmd FocusGained * :redraw!
 augroup END
 " }}} 
 
