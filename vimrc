@@ -156,12 +156,23 @@ augroup vimrc_autocmd
     autocmd FileType cpp map <leader>//a O//ATTENTION
     autocmd FileType cpp map <leader>//f O//FINISHED
 
-    autocmd FileType rst map <leader>1 2O<ESC>i##<ESC>jo##<ESC>k
-    autocmd FileType rst map <leader>2 O<ESC>i**<ESC>jo**<ESC>k
-    autocmd FileType rst map <leader>3 o==<ESC>k
-    autocmd FileType rst map <leader>4 o--<ESC>k
-    autocmd FileType rst map <leader>5 o^^<ESC>k
-    autocmd FileType rst map <leader>6 o""<ESC>k
+"     autocmd FileType rst map <leader>1 2O<ESC>i##<ESC>jo##<ESC>k
+"     autocmd FileType rst map <leader>2 O<ESC>i**<ESC>jo**<ESC>k
+"     autocmd FileType rst map <leader>3 o==<ESC>k
+"     autocmd FileType rst map <leader>4 o--<ESC>k
+"     autocmd FileType rst map <leader>5 o^^<ESC>k
+"     autocmd FileType rst map <leader>6 o""<ESC>k
+
+    au FileType rst nnoremap <leader>1 ^yypv$r=o<cr><esc>
+    au FileType rst inoremap <leader>1 <esc>^yypv$r=o<cr>
+    au FileType rst nnoremap <leader>2 ^yypv$r-o<cr><cr><cr><cr><cr><cr><esc>kkkk
+    au FileType rst inoremap <leader>2 <esc>^yypv$r-o<cr><cr><cr><cr><cr><cr><esc>kkkki
+    au FileType rst nnoremap <leader>3 ^yypv$r+o<cr><cr><cr><cr><cr><cr><esc>kkkk
+    au FileType rst inoremap <leader>3 <esc>^yypv$r+o<cr><cr><cr><cr><cr><cr><esc>kkkki
+    au FileType rst nnoremap <leader>4 ^yypv$r~o<cr><cr><cr><cr><cr><cr><esc>kkkk
+    au FileType rst inoremap <leader>4 <esc>^yypv$r~o<cr><cr><cr><cr><cr><cr><esc>kkkki
+    au FileType rst nnoremap <leader>5 ^yypv$r*o<cr><cr><cr><cr><cr><cr><esc>kkkk
+    au FileType rst inoremap <leader>5 <esc>^yypv$r*o<cr><cr><cr><cr><cr><cr><esc>kkkki
 
     autocmd FocusLost * :set number
     autocmd FocusGained * :set relativenumber
