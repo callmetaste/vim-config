@@ -17,6 +17,8 @@ set expandtab " tabs are spaces
 set list listchars=tab:▷⋅,trail:⋅,nbsp:⋅ " highlights whitespace
 set statusline=%F%m%r%h%w\ [TYPE=%Y\ %{&ff}]\
             \ [%l/%L]\ (%p%%) " detailed command bar
+" openning a line in insert mode
+nnoremap <C-o> i<cr><esc>
 "tab
 " for command mode
 nnoremap <S-Tab> <<
@@ -46,6 +48,7 @@ set cursorline " highlight current line
 " set lazyredraw " redraw only when we need
 set ttyfast
 set wrap
+set textwidth=0 wrapmargin=0
 set colorcolumn=80 " column at 80
 " searching
 set showmatch " highlight matching {[()]}
@@ -85,8 +88,10 @@ noremap k gk
 onoremap j j
 onoremap k k
 " move to beginning/end of line
+" together with virtualedit=onemore, moves the cursor one more
 noremap B ^
 noremap E $
+noremap W $l
 " $/^ doesn't do anything
 nnoremap $ <nop>
 nnoremap ^ <nop>
@@ -148,7 +153,7 @@ augroup vimrc_autocmd
     "python
     autocmd FileType python set autoindent
     autocmd FileType python set smartindent
-    autocmd FileType python set textwidth=79 " PEP-8 Friendlynting
+"     autocmd FileType python set textwidth=79 " PEP-8 Friendlynting
     autocmd FileType python map <leader>/n O# Note:<cr>
     autocmd FileType python map <leader>/t O# TODO:<cr>
     "C
@@ -171,6 +176,7 @@ augroup vimrc_autocmd
     autocmd InsertLeave * :set relativenumber
     autocmd FocusGained * :redraw!
 augroup END
+
 augroup filetypedetect_rst
     au!
     " Headings
