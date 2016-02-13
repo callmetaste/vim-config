@@ -37,6 +37,7 @@ set showcmd " show command in bottom bar
 set history=200 " a longer command history
 set wildmenu " visual autocomplete for command menu
 set lines=30 columns=85
+set autochdir
 " cursor
 set virtualedit=onemore " allows cursor beyond last char
 set scrolljump=7
@@ -52,6 +53,7 @@ set textwidth=0 wrapmargin=0
 set colorcolumn=80 " column at 80
 " searching
 set showmatch " highlight matching {[()]}
+set synmaxcol=250 " fixes slow downs with really long lines
 " }}}
 
 " searching {{{
@@ -162,13 +164,6 @@ augroup vimrc_autocmd
     autocmd FileType cpp map <leader>//a O//ATTENTION
     autocmd FileType cpp map <leader>//f O//FINISHED
 
-"     autocmd FileType rst map <leader>1 2O<ESC>i##<ESC>jo##<ESC>k
-"     autocmd FileType rst map <leader>2 O<ESC>i**<ESC>jo**<ESC>k
-"     autocmd FileType rst map <leader>3 o==<ESC>k
-"     autocmd FileType rst map <leader>4 o--<ESC>k
-"     autocmd FileType rst map <leader>5 o^^<ESC>k
-"     autocmd FileType rst map <leader>6 o""<ESC>k
-
     autocmd FocusLost * :set number
     autocmd FocusGained * :set relativenumber
 
@@ -176,9 +171,12 @@ augroup vimrc_autocmd
     autocmd InsertLeave * :set relativenumber
     autocmd FocusGained * :redraw!
 augroup END
+" }}}
 
+" auto group rst {{{
 augroup filetypedetect_rst
     au!
+    
     " Headings
     au FileType rst nnoremap <leader>h1 ^yypv$r=o<cr><esc>
     au FileType rst inoremap <leader>h1 <esc>^yypv$r=o<cr>
@@ -194,6 +192,9 @@ augroup filetypedetect_rst
 
     au FileType rst nnoremap <leader>h5 ^yypv$r*o<cr><cr><cr><cr><cr><cr><esc>kkkk
     au FileType rst inoremap <leader>h5 <esc>^yypv$r*o<cr><cr><cr><cr><cr><cr><esc>kkkki
+
+
+
     """Make Link (ml)
     " Highlight a word or phrase and it creates a link and opens a split so
     " you can edit the url separately. Once you are done editing the link,
@@ -225,8 +226,69 @@ augroup filetypedetect_rst
 augroup END
 " }}} 
 
+" auto group md {{{
+augroup filetypedetect_md
+    au!
+    
+    " Headings
+    au FileType md nnoremap <leader>h1 ^yypv$r=o<cr><esc>
+    au FileType md inoremap <leader>h1 <esc>^yypv$r=o<cr>
+
+    au FileType md nnoremap <leader>h2 ^yypv$r-o<cr><cr><cr><cr><cr><cr><esc>kkkk
+    au FileType md inoremap <leader>h2 <esc>^yypv$r-o<cr><cr><cr><cr><cr><cr><esc>kkkki
+
+    au FileType md nnoremap <leader>h3 ^yypv$r+o<cr><cr><cr><cr><cr><cr><esc>kkkk
+    au FileType md inoremap <leader>h3 <esc>^yypv$r+o<cr><cr><cr><cr><cr><cr><esc>kkkki
+
+    au FileType md nnoremap <leader>h4 ^yypv$r~o<cr><cr><cr><cr><cr><cr><esc>kkkk
+    au FileType md inoremap <leader>h4 <esc>^yypv$r~o<cr><cr><cr><cr><cr><cr><esc>kkkki
+
+    au FileType md nnoremap <leader>h5 ^yypv$r*o<cr><cr><cr><cr><cr><cr><esc>kkkk
+    au FileType md inoremap <leader>h5 <esc>^yypv$r*o<cr><cr><cr><cr><cr><cr><esc>kkkki
+
+
+
+    """Make Link (ml)
+    " Highlight a word or phrase and it creates a link and opens a split so
+    " you can edit the url separately. Once you are done editing the link,
+    " simply close that split.
+    au FileType md vnoremap <leader>ml yi`<esc>gvvlli`_<esc>:vsplit<cr><C-W>l:$<cr>o<cr>.. _<esc>pA: http://TODO<esc>vb
+    """Make footnote (ml)
+    au FileType md iabbrev mfn [#]_<esc>:vsplit<cr><C-W>l:$<cr>o<cr>.. [#] TODO
+    au FileType md set spell
+    "Create image
+    au FileType md iabbrev iii .. image:: TODO.png<cr>    :scale: 100<cr>:align: center<cr><esc>kkkeel
+    "Create figure
+    "au FileType md iabbrev iif .. figure:: TODO.png<cr>    :scale: 100<cr>:align: center<cr>:alt: TODO<cr><cr><cr>Some brief description<esc>kkkeel
+
+    "Create note
+    au FileType md iabbrev nnn .. note:: 
+    "Start or end bold text inline
+    au FileType md inoremap <leader>bb **
+    "Start or end italicized text inline
+    au FileType md inoremap <leader>ii *
+    "Start or end preformatted text inline
+    au FileType md inoremap <leader>pf ``
+
+    " Fold settings
+    "au FileType md set foldmethod=marker
+    
+    " Admonitions
+    au FileType md iabbrev adw .. warning::
+    au FileType md iabbrev adn .. note::
+augroup END
+" }}} 
+
 " miscellaneous stuff i'm too lazy to group right now {{{
-set clipboard=unnamed " copy into system clipboard
+set clipboard=unnamed " copy into system clipboard = "*
+"duplicate line
+map <leader>y Yp
+map <leader>p o<esc>p
+map <leader>P O<esc>p
+" first delete the black whole register
+" to allow easy replacement
+xnoremap p "*dP
+
 set backspace=indent,eol,start
 set gfn=Monospace\ 12 " font
 
@@ -246,10 +308,6 @@ map <M-k> ddkP
 map <M><down> ddp
 map <M><up> ddkP
 
-"duplicate line
-map <leader>y Yp
-map <leader>p o<esc>p
-map <leader>P O<esc>p
 
 "stop sucking
 set ruler
