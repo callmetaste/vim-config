@@ -24,4 +24,5 @@ function! s:align()
     endif
 endfunction
 
-noremap <localleader><tab> Tab: /b:comment_leader
+noremap <leader><tab> xhp :Tab / <C-R>-/l0<CR>
+

@@ -1,7 +1,44 @@
 " autoload plugin stuff {{{
+" resets several options to their defaults
+set nocompatible 
 runtime bundle/vim-pathogen/autoload/pathogen.vim
 execute pathogen#infect()
 let g:pymode_rope_autoimport=0
+let g:rainbow_active = 1
+" }}}
+
+
+" surround {{{
+" makes adding parenthesis easy
+nmap <leader>) csw)
+vmap <leader>) <S-S>)
+" }}}
+
+" UI config {{{
+filetype plugin indent on " load filetype-specific indent files
+set showcmd " show command in bottom bar
+set history=200 " a longer command history
+set wildmenu " visual autocomplete for command enu
+set lines=30 columns=85
+set autochdir
+" Map Ctrl-Backspace to delete the previous word in insert mode.
+imap <C-BS> <C-W>
+" cursor
+set virtualedit=onemore " allows cursor beyond last char
+set scrolljump=7
+set scrolloff=5
+" readability
+set formatoptions=1 lbr " linewrapping
+set number " show line numbers
+set cursorline " highlight current line
+" set lazyredraw " redraw only when we need
+set ttyfast
+set wrap
+set textwidth=0 wrapmargin=0
+set colorcolumn=80 " column at 80
+" searching
+set showmatch " highlight matching {[()]}
+set synmaxcol=250 " fixes slow downs with really long lines
 " }}}
 
 " color {{{
@@ -29,31 +66,6 @@ inoremap <Tab> <C-t>
 " for visual mode
 vnoremap <S-Tab> <
 vnoremap <Tab> >
-" }}}
-
-" UI config {{{
-filetype plugin indent on " load filetype-specific indent files
-set showcmd " show command in bottom bar
-set history=200 " a longer command history
-set wildmenu " visual autocomplete for command menu
-set lines=30 columns=85
-set autochdir
-" cursor
-set virtualedit=onemore " allows cursor beyond last char
-set scrolljump=7
-set scrolloff=5
-" readability
-set formatoptions=1 lbr " linewrapping
-set number " show line numbers
-set cursorline " highlight current line
-" set lazyredraw " redraw only when we need
-set ttyfast
-set wrap
-set textwidth=0 wrapmargin=0
-set colorcolumn=80 " column at 80
-" searching
-set showmatch " highlight matching {[()]}
-set synmaxcol=250 " fixes slow downs with really long lines
 " }}}
 
 " searching {{{
@@ -93,6 +105,7 @@ onoremap k k
 " together with virtualedit=onemore, moves the cursor one more
 noremap B ^
 noremap E $
+vnoremap E $h
 noremap W $l
 " $/^ doesn't do anything
 nnoremap $ <nop>
@@ -105,6 +118,10 @@ nnoremap gV '[v']
 " explicit mapping of <leader>= \  and <localleader>= ,
 let mapleader="\\"
 let maplocalleader=","
+" replace the current word with yank
+nmap <leader>r viwc<C-R>0<esc>
+" temp 
+nmap <localleader><localleader> whxvExi()<esc>hp
 "vimrc editing
 " toggle gundo
 nnoremap <leader>u :GundoToggle<CR>
@@ -119,7 +136,7 @@ function! SpellToggle()
         echom "SPELL CHECK OFF. "
         set nospell
     else " currently disabled, set to enable
-        echom "SPELL CHECK ON. suggestions:z= next:]s" 
+        echom "SPELL CHECK ON. Suggestions:z= next:]s" 
         setlocal spell spelllang=en_us
     endif
 endfunc
@@ -140,36 +157,51 @@ augroup vimrc_autocmd
     " FileTypePattern = [python, cpp, rst, ...]
     "
     " Commenting blocks of code.
+
+
     autocmd FileType c,cpp,java,scala let b:comment_leader = '// '
-    autocmd FileType sh,ruby,python   let b:comment_leader = '# '
     autocmd FileType conf,fstab       let b:comment_leader = '# '
     autocmd FileType tex              let b:comment_leader = '% '
     autocmd FileType mail             let b:comment_leader = '> '
     autocmd FileType vim              let b:comment_leader = '" '
+    autocmd FileType sh,ruby          let b:comment_leader = '# '
+    autocmd FileType python           let b:comment_leader = '# '
+
     noremap <silent> <localleader>c :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:nohlsearch<CR>
     noremap <silent> <localleader>u :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:nohlsearch<CR>
+
     " Aligns comments
     " "<C-R>" pastes the register while "=escape()" assigns the register a
     " value
     noremap <silent> <localleader><Tab> :Tab /<C-R>=escape(b:comment_leader,'\/')<CR><CR>
     "python
-    autocmd FileType python set autoindent
+"     autocmd FileType python set autoindent
     autocmd FileType python set smartindent
+    
+    noremap <silent> <localleader>> I>>> <esc>
+    noremap <silent> <localleader>< :<C-B>silent <C-E>s/^\V<C-R>=escape('>>> ','\/')<CR>//e<CR>:nohlsearch<CR>
 "     autocmd FileType python set textwidth=79 " PEP-8 Friendlynting
-    autocmd FileType python map <leader>/n O# Note:<cr>
-    autocmd FileType python map <leader>/t O# TODO:<cr>
+    autocmd FileType python map <localleader>n O# Note:<cr>"""<cr>"""<esc>O
+    autocmd FileType python map <localleader>t O# TODO:<cr>"""<cr>"""<esc>O
     "C
     autocmd FileType cpp set cindent      " - stricter rules for C programs
-    autocmd FileType cpp map <leader>//n O//Note:
-    autocmd FileType cpp map <leader>//a O//ATTENTION
-    autocmd FileType cpp map <leader>//f O//FINISHED
+    autocmd FileType cpp map <localleader>n O//Note:
+    autocmd FileType cpp map <localleader>a O//ATTENTION
+    autocmd FileType cpp map <localleader>f O//FINISHED
 
     autocmd FocusLost * :set number
     autocmd FocusGained * :set relativenumber
+" If you prefer the Omni-Completion tip window to close when a selection is
+" made, these lines close it on movement in insert mode or when leaving
+" insert mode
+    autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
+    autocmd InsertLeave * if pumvisible() == 0|pclose|endif
 
     autocmd InsertEnter * :set number
     autocmd InsertLeave * :set relativenumber
     autocmd FocusGained * :redraw!
+
+
 augroup END
 " }}}
 
@@ -309,18 +341,17 @@ map <M><up> ddkP
 set ruler
 set laststatus=2
 set number
+set ttimeoutlen=100
 set timeoutlen=5000
-set nocompatible 
 
 "search
-set incsearch
 set smartcase
 set hlsearch
 
 
 
 "copy paragraphs
-noremap yp yap<S-}>p
+" noremap yp yap<S-}>p
 
 "move between panes
 noremap <C-l> <C-w>l
@@ -328,7 +359,6 @@ noremap <C-h> <C-w>h
 noremap <C-j> <C-w>j
 noremap <C-k> <C-w>k
 
-set nocompatible
 " }}}
 
 " tell vim to to structure this file differently

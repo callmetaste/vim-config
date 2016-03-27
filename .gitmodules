@@ -19,3 +19,15 @@
 [submodule "bundle/tabular"]
 	path = bundle/tabular
 	url = https://github.com/godlygeek/tabular
+[submodule "bundle/closetag.vim"]
+    path = bundle/closetag.vim
+    url = https://github.com/vim-scripts/closetag.vim.git
+[submodule "bundle/vim-autoclose"]
+    path = bundle/vim-autoclose
+    url = https://github.com/Townk/vim-autoclose.git
+[submodule "bundle/rainbow"]
+	path = bundle/rainbow
+	url = https://github.com/luochen1990/rainbow.git
+[submodule "bundle/vim-surround"]
+	path = bundle/vim-surround
+	url = https://github.com/tpope/vim-surround.git
