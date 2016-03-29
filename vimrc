@@ -3,10 +3,31 @@
 set nocompatible 
 runtime bundle/vim-pathogen/autoload/pathogen.vim
 execute pathogen#infect()
-let g:pymode_rope_autoimport=0
+" let g:pymode_rope_autoimport=0
 let g:rainbow_active = 1
+autocmd!
 " }}}
 
+" syntastic {{{
+autocmd FileType python set makeprg=pylint\ --reports=n\ --msg-template=\"{path}:{line}:\ {msg_id}\ {symbol},\ {obj}\ {msg}\"\ %:p
+autocmd FileType python set errorformat=%f:%l:\ %m
+
+" au GUIENTER 
+
+" set statusline+=%#warningmsg#
+" set statusline+=%{SyntasticStatuslineFlag()}
+" set statusline+=%*
+
+let g:syntastic_python_checkers = ['pylint']
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+let g:syntastic_stl_format =
+            \'[%E{|Err| = %e: %fe}%B{, }%W{|Warn| = %w: %fw}]'
+let g:syntastic_error_symbol = "✗"
+let g:syntastic_warning_symbol = "⚠"
+" }}}
 
 " surround {{{
 " makes adding parenthesis easy
@@ -14,19 +35,53 @@ nmap <leader>) csw)
 vmap <leader>) <S-S>)
 " }}}
 
+
+function ToggleFlag(option,flag)
+  exec ('let lopt = &' . a:option)
+  if lopt =~ (".*" . a:flag . ".*")
+    exec ('set ' . a:option . '-=' . a:flag)
+  else
+    exec ('set ' . a:option . '+=' . a:flag)
+  endif
+endfunction
+map <silent> <F7> :call ToggleFlag("guioptions","m")<CR>
+map <silent> <F8> :call ToggleFlag("guioptions","T")<CR>
+"moving line up/down
+map <M-j> ddp 
+map <M-k> ddkP 
+map <M><down> ddp
+map <M><up> ddkP
+
+" copy into system clipboard = "*
+" set clipboard=unnamed 
+"duplicate line
+map <leader>y Yp
+map <leader>p o<esc>p
+map <leader>P O<esc>p
+" first delete the black whole register
+" to allow easy replacement
+" xnoremap p "*dP
+
+"stop sucking
+set ruler
+set laststatus=2
+set number
+set ttimeoutlen=100
+set timeoutlen=5000
+
 " UI config {{{
 filetype plugin indent on " load filetype-specific indent files
 set showcmd " show command in bottom bar
 set history=200 " a longer command history
-set wildmenu " visual autocomplete for command enu
+set wildmenu " visual autocomplete for command menu
 set lines=30 columns=85
 set autochdir
 " Map Ctrl-Backspace to delete the previous word in insert mode.
 imap <C-BS> <C-W>
 " cursor
 set virtualedit=onemore " allows cursor beyond last char
-set scrolljump=7
-set scrolloff=5
+set scrolljump=7 " automatically scroll n when the cursor hits the edge
+set scrolloff=5 " keep the cursor n lines from the edge
 " readability
 set formatoptions=1 lbr " linewrapping
 set number " show line numbers
@@ -35,7 +90,7 @@ set cursorline " highlight current line
 set ttyfast
 set wrap
 set textwidth=0 wrapmargin=0
-set colorcolumn=80 " column at 80
+set colorcolumn=80 " column at 80 "
 " searching
 set showmatch " highlight matching {[()]}
 set synmaxcol=250 " fixes slow downs with really long lines
@@ -52,8 +107,16 @@ set shiftwidth=4 " indenting is 4 spaces
 set tabstop=4 " number of visual spaces per TAB
 set expandtab " tabs are spaces
 set list listchars=tab:▷⋅,trail:⋅,nbsp:⋅ " highlights whitespace
-set statusline=%F%m%r%h%w\ [TYPE=%Y\ %{&ff}]\
-            \ [%l/%L]\ (%p%%) " detailed command bar
+" set statusline+=%#warningmsg#
+" set statusline+=%{SyntasticStatuslineFlag()}
+" set statusline+=%*
+" detailed command bar
+set statusline=%F%m%r%h%w\ [TYPE=%Y\ %{&ff}]\ [%l/%L]\ (%p%%)\ 
+            \\ %{SyntasticStatuslineFlag()}
+
+
+
+
 " openning a line in insert mode
 nnoremap <C-o> i<cr><esc>
 "tab
@@ -115,7 +178,7 @@ nnoremap gV '[v']
 " }}}
 
 " <leader> bindings {{{
-" explicit mapping of <leader>= \  and <localleader>= ,
+" explicit mapping of <leader> \  and <localleader> ,
 let mapleader="\\"
 let maplocalleader=","
 " replace the current word with yank
@@ -149,7 +212,7 @@ nnoremap <leader>s :mksession <CR>
 " auto commands {{{
 augroup vimrc_autocmd
 " ensures commands are loaded only once
-    autocmd!
+"     autocmd!
     " Implementation comments
     " au[tocmd] [group] {event} {patern} [nested] {cmd}
     " group = [aug[roup], ...] " examples: aug_new
@@ -167,19 +230,26 @@ augroup vimrc_autocmd
     autocmd FileType sh,ruby          let b:comment_leader = '# '
     autocmd FileType python           let b:comment_leader = '# '
 
-    noremap <silent> <localleader>c :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:nohlsearch<CR>
-    noremap <silent> <localleader>u :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:nohlsearch<CR>
+    noremap <silent> <localleader>c 
+                \:<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')
+                \<CR>/<CR>:nohlsearch<CR>
+    noremap <silent> <localleader>u 
+                \:<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')
+                \<CR>//e<CR>:nohlsearch<CR>
 
     " Aligns comments
     " "<C-R>" pastes the register while "=escape()" assigns the register a
     " value
-    noremap <silent> <localleader><Tab> :Tab /<C-R>=escape(b:comment_leader,'\/')<CR><CR>
+    noremap <silent> <localleader><Tab> 
+                \:Tab /<C-R>=escape(b:comment_leader,'\/')<CR><CR>
     "python
 "     autocmd FileType python set autoindent
     autocmd FileType python set smartindent
     
     noremap <silent> <localleader>> I>>> <esc>
-    noremap <silent> <localleader>< :<C-B>silent <C-E>s/^\V<C-R>=escape('>>> ','\/')<CR>//e<CR>:nohlsearch<CR>
+    noremap <silent> <localleader>< 
+                \:<C-B>silent <C-E>s/^\V<C-R>=escape('>>> ','\/')
+                \<CR>//e<CR>:nohlsearch<CR>
 "     autocmd FileType python set textwidth=79 " PEP-8 Friendlynting
     autocmd FileType python map <localleader>n O# Note:<cr>"""<cr>"""<esc>O
     autocmd FileType python map <localleader>t O# TODO:<cr>"""<cr>"""<esc>O
@@ -200,7 +270,6 @@ augroup vimrc_autocmd
     autocmd InsertEnter * :set number
     autocmd InsertLeave * :set relativenumber
     autocmd FocusGained * :redraw!
-
 
 augroup END
 " }}}
@@ -262,17 +331,24 @@ augroup filetypedetect_md
     au FileType md nnoremap <leader>h1 ^yypv$r=o<cr><esc>
     au FileType md inoremap <leader>h1 <esc>^yypv$r=o<cr>
 
-    au FileType md nnoremap <leader>h2 ^yypv$r-o<cr><cr><cr><cr><cr><cr><esc>kkkk
-    au FileType md inoremap <leader>h2 <esc>^yypv$r-o<cr><cr><cr><cr><cr><cr><esc>kkkki
+    au FileType md nnoremap <leader>h2 ^yypv$r-o 
+                \  <cr><cr><cr><cr><cr><cr><esc> kkkk
+    au FileType md inoremap <leader>h2 <esc>^yypv$r-o
+                \<cr><cr><cr><cr><cr><cr><esc>kkkki 
+    au FileType md nnoremap <leader>h3 ^yypv$r+o
+                \<cr><cr><cr><cr><cr><cr><esc>kkkk
+    au FileType md inoremap <leader>h3 <esc>^yypv$r+o
+                \<cr><cr><cr><cr><cr><cr><esc>kkkki
 
-    au FileType md nnoremap <leader>h3 ^yypv$r+o<cr><cr><cr><cr><cr><cr><esc>kkkk
-    au FileType md inoremap <leader>h3 <esc>^yypv$r+o<cr><cr><cr><cr><cr><cr><esc>kkkki
+    au FileType md nnoremap <leader>h4 ^yypv$r~o
+                \<cr><cr><cr><cr><cr><cr><esc>kkkk
+    au FileType md inoremap <leader>h4 <esc>^yypv$r~o
+                \<cr><cr><cr><cr><cr><cr><esc>kkkki
 
-    au FileType md nnoremap <leader>h4 ^yypv$r~o<cr><cr><cr><cr><cr><cr><esc>kkkk
-    au FileType md inoremap <leader>h4 <esc>^yypv$r~o<cr><cr><cr><cr><cr><cr><esc>kkkki
-
-    au FileType md nnoremap <leader>h5 ^yypv$r*o<cr><cr><cr><cr><cr><cr><esc>kkkk
-    au FileType md inoremap <leader>h5 <esc>^yypv$r*o<cr><cr><cr><cr><cr><cr><esc>kkkki
+    au FileType md nnoremap <leader>h5 ^yypv$r*o
+                \<cr><cr><cr><cr><cr><cr><esc>kkkk
+    au FileType md inoremap <leader>h5 <esc>^yypv$r*o
+                \<cr><cr><cr><cr><cr><cr><esc>kkkki
 
 
 
@@ -280,14 +356,18 @@ augroup filetypedetect_md
     " Highlight a word or phrase and it creates a link and opens a split so
     " you can edit the url separately. Once you are done editing the link,
     " simply close that split.
-    au FileType md vnoremap <leader>ml yi`<esc>gvvlli`_<esc>:vsplit<cr><C-W>l:$<cr>o<cr>.. _<esc>pA: http://TODO<esc>vb
+    au FileType md vnoremap <leader>ml yi`<esc>gvvlli`_<esc>:vsplit
+                \<cr><C-W>l:$<cr>o<cr>.. _<esc>pA: http://TODO<esc>vb
     """Make footnote (ml)
     au FileType md iabbrev mfn [#]_<esc>:vsplit<cr><C-W>l:$<cr>o<cr>.. [#] TODO
     au FileType md set spell
     "Create image
-    au FileType md iabbrev iii .. image:: TODO.png<cr>    :scale: 100<cr>:align: center<cr><esc>kkkeel
+    au FileType md iabbrev iii .. image:: TODO.png
+                \<cr>    :scale: 100<cr>:align: center<cr><esc>kkkeel
     "Create figure
-    "au FileType md iabbrev iif .. figure:: TODO.png<cr>    :scale: 100<cr>:align: center<cr>:alt: TODO<cr><cr><cr>Some brief description<esc>kkkeel
+    au FileType md iabbrev iif .. figure:: TODO.png
+                \<cr>    :scale: 100<cr>:align: center
+                \<cr>:alt: TODO<cr><cr><cr>Some brief description<esc>kkkeel
 
     "Create note
     au FileType md iabbrev nnn .. note:: 
@@ -308,50 +388,28 @@ augroup END
 " }}} 
 
 " miscellaneous stuff i'm too lazy to group right now {{{
-set clipboard=unnamed " copy into system clipboard = "*
-"duplicate line
-map <leader>y Yp
-map <leader>p o<esc>p
-map <leader>P O<esc>p
-" first delete the black whole register
-" to allow easy replacement
-xnoremap p "*dP
+
 
 set backspace=indent,eol,start
 set gfn=Monospace\ 12 " font
 
-set splitbelow
 set splitright
+set splitbelow
 
 
 
 """"formatting""""
 map <leader><space> =ip
 map <leader><space>g gg=G :echom "Indenting whole file." <cr>
+nnoremap <silent> <F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR>
 
 
-"moving line up/down
-map <M-j> ddp 
-map <M-k> ddkP 
-map <M><down> ddp
-map <M><up> ddkP
 
 
-"stop sucking
-set ruler
-set laststatus=2
-set number
-set ttimeoutlen=100
-set timeoutlen=5000
 
 "search
 set smartcase
 set hlsearch
-
-
-
-"copy paragraphs
-" noremap yp yap<S-}>p
 
 "move between panes
 noremap <C-l> <C-w>l

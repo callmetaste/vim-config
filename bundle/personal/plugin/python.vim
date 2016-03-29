@@ -1,5 +1,3 @@
-autocmd FileType python set makeprg=pylint\ --reports=n\ --msg-template=\"{path}:{line}:\ {msg_id}\ {symbol},\ {obj}\ {msg}\"\ %:p
-autocmd FileType python set errorformat=%f:%l:\ %m
 
 function <SID>PythonGrep(tool)
   set lazyredraw
