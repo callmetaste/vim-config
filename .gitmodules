@@ -34,3 +34,15 @@
 [submodule "bundle/syntastic"]
 	path = bundle/syntastic
 	url = https://github.com/scrooloose/syntastic.git
+[submodule "bundle/python-mode"]
+	path = bundle/python-mode
+	url = https://github.com/klen/python-mode.git
+[submodule "bundle/united-front"]
+	path = bundle/united-front
+	url = https://github.com/ardagnir/united-front.git
+[submodule "bundle/riv.vim"]
+	path = bundle/riv.vim
+	url = https://github.com/Rykka/riv.vim.git
+[submodule "bundle/InstantRst"]
+	path = bundle/InstantRst
+	url = https://github.com/Rykka/InstantRst.git
