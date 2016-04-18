@@ -24,6 +24,7 @@ call pathogen#helptags()
 let g:pymode = 1
 let g:rainbow_active = 1
 let g:tex_conceal = ''
+
 " ensure that autocommands are only loaded once
 autocmd!
 " }}}
@@ -153,7 +154,11 @@ set timeoutlen=5000
 " }}}
 " color {{{
 syntax enable " enable syntax processing
-colorscheme badwolf
+if has("gui_running")
+    colorscheme badwolf
+else
+    colorscheme eclipse
+endif
 " }}}
 " spaces and tabs {{{
 syntax on                                "allows vim to highlight language
