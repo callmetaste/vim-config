@@ -157,7 +157,7 @@ syntax enable " enable syntax processing
 if has("gui_running")
     colorscheme badwolf
 else
-    colorscheme eclipse
+    colorscheme neon
 endif
 " }}}
 " spaces and tabs {{{
@@ -398,6 +398,7 @@ augroup filetypedetect_md
     au FileType md iabbrev adn .. note::
 augroup END
 " }}} 
+" miscellaneous stuff i'm too lazy to group right now {{{
 nmap == :set textwidth=72<CR>gqj:set textwidth=79<CR>
 function! GetPythonTextWidth()
     if !exists('g:python_normal_text_width')
@@ -434,7 +435,6 @@ augroup pep8
     au!
     autocmd CursorMoved,CursorMovedI * :if &ft == 'python' | :exe 'setlocal textwidth='.GetPythonTextWidth() | :endif
 augroup END
-" miscellaneous stuff i'm too lazy to group right now {{{
 
 
 
