@@ -44,9 +44,9 @@ command! NEXTCOLOR   :call s:NextColorscheme()
 command! PREVCOLOR   :call s:PrevColorscheme()
 
 " Example of convenience mappings:
-map <silent><F3> :NEXTCOLOR<cr>
-map <silent><F2> :PREVCOLOR<cr>
-map <silent><F4> :SCROLLCOLOR<cr>
+" map <silent><F3> :NEXTCOLOR<cr>
+" map <silent><F2> :PREVCOLOR<cr>
+" map <silent><F4> :SCROLLCOLOR<cr>
 
 function! s:ScrollerHelp()
     echo " "

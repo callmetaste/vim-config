@@ -113,6 +113,7 @@ nmap <leader>) csw)
 vmap <leader>) <S-S>)
 " }}}
 " UI config {{{
+nmap <silent><f4> :SCROLLCOLOR<cr>
 filetype plugin indent on "load filetype-specific indent files
 set gfn=Monospace\ 12     "font
 set showcmd               "show command in bottom bar
@@ -123,7 +124,9 @@ set history=200 "a longer command history
 set wildmenu    "visual autocomplete for command menu
 set lines=30 columns=85
 set autochdir
-map <s-f12> :w<cr>
+nmap <s-f12> :w<cr>
+nmap <f5> :tabn<cr>
+nmap <s-f5> :tabp<cr>
 " copy into system clipboard = "*
 set clipboard=unnamed
 " Map Ctrl-BS and Ctrl-Del to delete the previous word in insert mode.
@@ -151,6 +154,42 @@ set ruler
 set laststatus=2
 set ttimeoutlen=100
 set timeoutlen=5000
+nmap == :set textwidth=72<CR>gqj:set textwidth=79<CR>
+function! GetPythonTextWidth()
+    if !exists('g:python_normal_text_width')
+        let normal_text_width = 79
+    else
+        let normal_text_width = g:python_normal_text_width
+    endif
+
+    if !exists('g:python_comment_text_width')
+        let comment_text_width = 72
+    else
+        let comment_text_width = g:python_comment_text_width
+    endif
+
+    let cur_syntax = synIDattr(synIDtrans(synID(line("."), col("."), 0)), "name")
+    if cur_syntax == "Comment"
+        return comment_text_width
+    elseif cur_syntax == "String"
+        " Check to see if we're in a docstring
+        let lnum = line(".")
+        while lnum >= 1 && (synIDattr(synIDtrans(synID(lnum, col([lnum, "$"]) - 1, 0)), "name") == "String" || match(getline(lnum), '\v^\s*$') > -1)
+            if match(getline(lnum), "\\('''\\|\"\"\"\\)") > -1
+                " Assume that any longstring is a docstring
+                return comment_text_width
+            endif
+            let lnum -= 1
+        endwhile
+    endif
+
+    return normal_text_width
+endfunction
+
+augroup pep8
+    au!
+    autocmd CursorMoved,CursorMovedI * :if &ft == 'python' | :exe 'setlocal textwidth='.GetPythonTextWidth() | :endif
+augroup END
 " }}}
 " color {{{
 syntax enable " enable syntax processing
@@ -238,9 +277,9 @@ nmap <localleader><localleader> whxvExi()<esc>hp
 nnoremap <leader>u :GundoToggle<CR>
 "edit vimrc and load vimrc bindings
 map <leader>ev :vsp $MYVIMRC <CR>
-map <F9> :tabedit ~/.vim/vimrc<CR>
+map <s-F9> :tabedit ~/.vim/vimrc<CR>
 map <leader>wv :source $MYVIMRC <CR> :echom "NEW VIMRC LOADED!" <CR>
-map <F6> :so ~/.vimrc<CR> :echom "NEW VIMRC LOADED!" <CR>
+map <F9> :so ~/.vimrc<CR> :echom "NEW VIMRC LOADED!" <CR>
 
 let $rst='/home/mate/.vim/bundle/personal/plugin/rst.vim'
 " turn spelling on/off
@@ -398,42 +437,6 @@ augroup filetypedetect_md
     au FileType md iabbrev adn .. note::
 augroup END
 " }}} 
-nmap == :set textwidth=72<CR>gqj:set textwidth=79<CR>
-function! GetPythonTextWidth()
-    if !exists('g:python_normal_text_width')
-        let normal_text_width = 79
-    else
-        let normal_text_width = g:python_normal_text_width
-    endif
-
-    if !exists('g:python_comment_text_width')
-        let comment_text_width = 72
-    else
-        let comment_text_width = g:python_comment_text_width
-    endif
-
-    let cur_syntax = synIDattr(synIDtrans(synID(line("."), col("."), 0)), "name")
-    if cur_syntax == "Comment"
-        return comment_text_width
-    elseif cur_syntax == "String"
-        " Check to see if we're in a docstring
-        let lnum = line(".")
-        while lnum >= 1 && (synIDattr(synIDtrans(synID(lnum, col([lnum, "$"]) - 1, 0)), "name") == "String" || match(getline(lnum), '\v^\s*$') > -1)
-            if match(getline(lnum), "\\('''\\|\"\"\"\\)") > -1
-                " Assume that any longstring is a docstring
-                return comment_text_width
-            endif
-            let lnum -= 1
-        endwhile
-    endif
-
-    return normal_text_width
-endfunction
-
-augroup pep8
-    au!
-    autocmd CursorMoved,CursorMovedI * :if &ft == 'python' | :exe 'setlocal textwidth='.GetPythonTextWidth() | :endif
-augroup END
 " miscellaneous stuff i'm too lazy to group right now {{{
 
 
@@ -447,9 +450,10 @@ set splitbelow
 """"formatting""""
 map <leader><space> =ip
 map <leader><space>g gg=G :echom "Indenting whole file." <cr>
-nnoremap <silent> <F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR>
+" nnoremap <silent> <F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR>
 
 "search
+set ignorecase
 set smartcase
 set hlsearch
 
