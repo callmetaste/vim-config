@@ -196,7 +196,7 @@ syntax enable " enable syntax processing
 if has("gui_running")
     colorscheme badwolf
 else
-    colorscheme eclipse
+    colorscheme neon
 endif
 " }}}
 " spaces and tabs {{{
@@ -322,7 +322,7 @@ augroup vimrc_autocmd
     "
     " Commenting blocks of code.
 
-    autocmd FileType c,cpp,java,scala let b:comment_leader = '// '
+    autocmd FileType c,cpp,java,scala,cs let b:comment_leader = '// '
     autocmd FileType conf,fstab       let b:comment_leader = '# '
     autocmd FileType tex              let b:comment_leader = '% '
     autocmd FileType mail             let b:comment_leader = '> '
@@ -438,7 +438,6 @@ augroup filetypedetect_md
 augroup END
 " }}} 
 " miscellaneous stuff i'm too lazy to group right now {{{
-
 
 
 set backspace=indent,eol,start
