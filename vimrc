@@ -43,6 +43,7 @@ endfunction
 " instantrst {{{
 " let g:instant_rst_static = 'mars.css'
 " }}}
+
 " pymode {{{
 nmap <f7> :PymodeLint<cr>
 nmap <s-f7> :PymodeLintAuto<cr>
@@ -78,6 +79,7 @@ let g:pymode_rope_autoimport=0
 " let g:pymode_syntax_docstrings = 1
 
 " }}}
+
 " syntastic {{{
 autocmd FileType python set makeprg=pylint\ --reports=n\ --msg-template=\"{path}:{line}:\ {msg_id}\ {symbol},\ {obj}\ {msg}\"\ %:p
 autocmd FileType python set errorformat=%f:%l:\ %m
@@ -87,6 +89,7 @@ autocmd FileType python set errorformat=%f:%l:\ %m
 " set statusline+=%#warningmsg#
 " set statusline+=%{SyntasticStatuslineFlag()}
 " set statusline+=%*
+let g:syntastic_shell = "/bin/bash"
 
 let g:syntastic_python_checkers = ['pylint']
 let g:syntastic_always_populate_loc_list = 1
@@ -107,11 +110,13 @@ let g:syntastic_mode_map = {
     \ "passive_filetypes": ["python"] }
 
 " }}}
+
 " surround {{{
 " makes adding parenthesis easy
 nmap <leader>) csw)
 vmap <leader>) <S-S>)
 " }}}
+
 " UI config {{{
 nmap <silent><f4> :SCROLLCOLOR<cr>
 filetype plugin indent on "load filetype-specific indent files

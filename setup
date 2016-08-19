@@ -1,5 +1,12 @@
 echo "runtime vimrc" > ../.vimrc
 git submodule update --init --recursive ./bundle
+
+pip install instant-rst
+sudo apt-get install build-essential cmake
+sudo apt-get install python-dev
+cd ~/.vim/bundle/YouCompleteMe
+./install.py --clang-completer --omnisharp-completer
+
 mv ../vim-config ../.vim
 
 
