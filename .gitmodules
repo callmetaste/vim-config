@@ -19,9 +19,6 @@
 [submodule "bundle/closetag.vim"]
     path = bundle/closetag.vim
     url = https://github.com/vim-scripts/closetag.vim.git
-[submodule "bundle/vim-autoclose"]
-    path = bundle/vim-autoclose
-    url = https://github.com/Townk/vim-autoclose.git
 [submodule "bundle/rainbow"]
 	path = bundle/rainbow
 	url = https://github.com/luochen1990/rainbow.git
@@ -40,3 +37,12 @@
 [submodule "bundle/InstantRst"]
 	path = bundle/InstantRst
 	url = https://github.com/Rykka/InstantRst.git
+[submodule "bundle/YouCompleteMe"]
+	path = bundle/YouCompleteMe
+	url = https://github.com/Valloric/YouCompleteMe
+[submodule "bundle/vimtex"]
+	path = bundle/vimtex
+	url = https://github.com/lervag/vimtex
+[submodule "bundle/vim-easymotion"]
+	path = bundle/vim-easymotion
+	url = https://github.com/easymotion/vim-easymotion

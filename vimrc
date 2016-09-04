@@ -13,6 +13,7 @@
 
 
 " }}}
+
 " autoload plugin stuff {{{
 " resets several options to their defaults
 set nocompatible 
@@ -28,6 +29,7 @@ let g:tex_conceal = ''
 " ensure that autocommands are only loaded once
 autocmd!
 " }}}
+
 " {{{ unmappings
 autocmd VimEnter * call Unmappings()
 function! Unmappings()
@@ -40,6 +42,7 @@ function! Unmappings()
     nmap <leader>c viwc<C-R>0<esc>
 endfunction
 " }}}
+
 " instantrst {{{
 " let g:instant_rst_static = 'mars.css'
 " }}}
@@ -51,9 +54,9 @@ nmap <f8> :vert lopen<cr>
 let g:pymode_python = 'python'
 " ignore error code for unnecessary parenthesis
 " ignore import errors
-let g:pymode_lint_ignore = "C0325, F0401"
+" let g:pymode_lint_ignore = "C0325, F0401"
 " use these error checkers
-let g:pymode_lint_checkers = ['mccabe', 'pep8', 'pyflakes', 'pylint']
+" let g:pymode_lint_checkers = ['mccabe', 'pep8', 'pyflakes', 'pylint']
 let g:pymode_lint_on_write = 0
 let g:pymode_lint_cwindow = 0
 let g:pymode_lint_sort = ['E']
@@ -132,8 +135,11 @@ set autochdir
 nmap <s-f12> :w<cr>
 nmap <f5> :tabn<cr>
 nmap <s-f5> :tabp<cr>
+set splitright
+set splitbelow
 " copy into system clipboard = "*
 set clipboard=unnamed
+set backspace=indent,eol,start
 " Map Ctrl-BS and Ctrl-Del to delete the previous word in insert mode.
 imap <C-BS> <C-W>
 imap <C-del> <esc>lvedi
@@ -160,42 +166,8 @@ set laststatus=2
 set ttimeoutlen=100
 set timeoutlen=5000
 nmap == :set textwidth=72<CR>gqj:set textwidth=79<CR>
-function! GetPythonTextWidth()
-    if !exists('g:python_normal_text_width')
-        let normal_text_width = 79
-    else
-        let normal_text_width = g:python_normal_text_width
-    endif
-
-    if !exists('g:python_comment_text_width')
-        let comment_text_width = 72
-    else
-        let comment_text_width = g:python_comment_text_width
-    endif
-
-    let cur_syntax = synIDattr(synIDtrans(synID(line("."), col("."), 0)), "name")
-    if cur_syntax == "Comment"
-        return comment_text_width
-    elseif cur_syntax == "String"
-        " Check to see if we're in a docstring
-        let lnum = line(".")
-        while lnum >= 1 && (synIDattr(synIDtrans(synID(lnum, col([lnum, "$"]) - 1, 0)), "name") == "String" || match(getline(lnum), '\v^\s*$') > -1)
-            if match(getline(lnum), "\\('''\\|\"\"\"\\)") > -1
-                " Assume that any longstring is a docstring
-                return comment_text_width
-            endif
-            let lnum -= 1
-        endwhile
-    endif
-
-    return normal_text_width
-endfunction
-
-augroup pep8
-    au!
-    autocmd CursorMoved,CursorMovedI * :if &ft == 'python' | :exe 'setlocal textwidth='.GetPythonTextWidth() | :endif
-augroup END
 " }}}
+
 " color {{{
 syntax enable " enable syntax processing
 if has("gui_running")
@@ -204,6 +176,7 @@ else
     colorscheme neon
 endif
 " }}}
+
 " spaces and tabs {{{
 syntax on                                "allows vim to highlight language
                                          "syntax based on filetype
@@ -214,7 +187,6 @@ set expandtab                            "tabs are spaces
 set list listchars=tab:▷⋅,trail:⋅,nbsp:⋅ "highlights whitespace
 
 " openning a line in insert mode
-nnoremap <C-o> i<cr><esc>
 "tab
 " for command mode
 nnoremap <S-Tab> <<
@@ -226,12 +198,17 @@ inoremap <Tab> <C-t>
 vnoremap <S-Tab> <
 vnoremap <Tab> >
 " }}}
+
 " searching {{{
 set incsearch "search as characters are entered
 set hlsearch  "highlight matches
+set ignorecase
+set smartcase
+set hlsearch
 " turn off search highlight
 noremap <leader>/ :nohlsearch<CR>
 " }}}
+
 " folding {{{
 set foldenable        "enable folding
 set foldlevelstart=0  "open most folds by default
@@ -247,6 +224,7 @@ nmap <leader>f7 :set foldlevel=7<CR>>
 nmap <leader>f8 :set foldlevel=8<CR>>
 nmap <leader>f9 :set foldlevel=9<CR>>
 "}}} 
+
 " movement {{{
 " move vertically by visual line
 noremap j gj
@@ -261,8 +239,8 @@ noremap E $
 vnoremap E $h
 noremap W $l
 " $/^ doesn't do anything
-nnoremap $ <nop>
-nnoremap ^ <nop>
+" nnoremap $ <nop>
+" nnoremap ^ <nop>
 " highlight last inserted text
 nnoremap gV '[v']
 "moving line up/down
@@ -270,7 +248,13 @@ map <M-j> ddp
 map <M-k> ddkP 
 map <M><down> ddp
 map <M><up> ddkP
+"move between panes
+noremap <C-l> <C-w>l
+noremap <C-h> <C-w>h
+noremap <C-j> <C-w>j
+noremap <C-k> <C-w>k
 " }}}
+
 " <leader> bindings {{{
 " explicit mapping of <leader> \  and <localleader> ,
 let mapleader="\\"
@@ -316,6 +300,7 @@ endfunction
 " save session
 nnoremap <leader>s :mksession <CR>
 " }}}
+
 " auto commands {{{
 augroup vimrc_autocmd
     " Implementation comments
@@ -327,13 +312,13 @@ augroup vimrc_autocmd
     "
     " Commenting blocks of code.
 
-    autocmd FileType c,cpp,java,scala,cs let b:comment_leader = '// '
-    autocmd FileType conf,fstab       let b:comment_leader = '# '
-    autocmd FileType tex              let b:comment_leader = '% '
-    autocmd FileType mail             let b:comment_leader = '> '
-    autocmd FileType vim              let b:comment_leader = '" '
-    autocmd FileType sh,ruby          let b:comment_leader = '# '
-    autocmd FileType python           let b:comment_leader = '# '
+    autocmd FileType c,cpp,java,scala,cs  let b:comment_leader = '// '
+    autocmd FileType conf,fstab           let b:comment_leader = '# '
+    autocmd FileType tex                  let b:comment_leader = '% '
+    autocmd FileType mail                 let b:comment_leader = '> '
+    autocmd FileType vim                  let b:comment_leader = '" '
+    autocmd FileType sh,ruby              let b:comment_leader = '# '
+    autocmd FileType python               let b:comment_leader = '# '
 
 
     noremap <silent> <localleader>c
@@ -370,8 +355,8 @@ augroup vimrc_autocmd
 " If you prefer the Omni-Completion tip window to close when a selection is
 " made, these lines close it on movement in insert mode or when leaving
 " insert mode
-"     autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
-"     autocmd InsertLeave * if pumvisible() == 0|pclose|endif
+    autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
+    autocmd InsertLeave * if pumvisible() == 0|pclose|endif
 
     autocmd InsertEnter * :set number
     autocmd InsertLeave * :set relativenumber
@@ -442,30 +427,13 @@ augroup filetypedetect_md
     au FileType md iabbrev adn .. note::
 augroup END
 " }}} 
-" miscellaneous stuff i'm too lazy to group right now {{{
 
 
-set backspace=indent,eol,start
-
-set splitright
-set splitbelow
 
 
-""""formatting""""
-map <leader><space> =ip
-map <leader><space>g gg=G :echom "Indenting whole file." <cr>
-" nnoremap <silent> <F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR>
 
-"search
-set ignorecase
-set smartcase
-set hlsearch
 
-"move between panes
-noremap <C-l> <C-w>l
-noremap <C-h> <C-w>h
-noremap <C-j> <C-w>j
-noremap <C-k> <C-w>k
+
 
 " }}}
 
