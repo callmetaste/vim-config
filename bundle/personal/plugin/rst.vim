@@ -2,31 +2,31 @@ function! Rst()
     noremap <localleader>r :InstantRst
     noremap <localleader>cr :StopInstantRst
     " Headings
-    nnoremap <localleader>h1
+    nnoremap <localleader>1
                 \ ^yypVr=o<cr><esc>
-    inoremap <localleader>h1
+    inoremap <localleader>1
                 \ <esc>^yypv$r=o<cr>
 
-    nnoremap <localleader>h2
+    nnoremap <localleader>2
                 \ ^yypv$r-<esc>6o<esc>kkkk
-    inoremap <localleader>h2
+    inoremap <localleader>2
                 \ <esc>^yypv$r-o<cr><cr><cr><cr><cr><cr><esc>kkkki
 
-    nnoremap <localleader>h3
-                \ ^yypv$r.<esc>6o<esc>kkkk
-    inoremap <localleader>h3
+    nnoremap <localleader>3
+                \ ^yypv$r^<esc>6o<esc>kkkk
+    inoremap <localleader>3
                 \ <esc>^yypv$r+o<cr><cr><cr><cr><cr><cr><esc>kkkki
 
-    nnoremap <localleader>h4
+    nnoremap <localleader>4
                 \ ^yypv$r~o<cr><cr><cr><cr><cr><cr><esc>kkkk
-    inoremap <localleader>h4
+    inoremap <localleader>4
                 \ <esc>^yypv$r~o<cr><cr><cr><cr><cr><cr><esc>kkkki
 
-    nnoremap <localleader>h5
+    nnoremap <localleader>5
                 \ ^yypv$r*o<cr><cr><cr><cr><cr><cr><esc>kkkk
-    inoremap <localleader>h5
+    inoremap <localleader>5
                 \ <esc>^yypv$r*o<cr><cr><cr><cr><cr><cr><esc>kkkki
-    nnoremap <localleader>hl
+    nnoremap <localleader>l
                 \ ^O<c-o>0--------------------<esc>:s/\s\+$//e<cr>
 
     """Make Link (ml)

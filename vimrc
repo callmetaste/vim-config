@@ -135,10 +135,18 @@ set autochdir
 nmap <s-f12> :w<cr>
 nmap <f5> :tabn<cr>
 nmap <s-f5> :tabp<cr>
+" shift+mouse selects blocks
+noremap <c-LeftMouse> <4-LeftMouse>
+inoremap <c-LeftMouse> <4-LeftMouse>
+onoremap <c-LeftMouse> <C-C><4-LeftMouse>
+noremap <c-LeftDrag> <LeftDrag>
+inoremap <c-LeftDrag> <LeftDrag>
+onoremap <c-LeftDrag> <C-C><LeftDrag>
 set splitright
 set splitbelow
-" copy into system clipboard = "*
-set clipboard=unnamed
+" copy into system clipboard = +
+nmap <leader>y "+y
+set clipboard=unnamedplus
 set backspace=indent,eol,start
 " Map Ctrl-BS and Ctrl-Del to delete the previous word in insert mode.
 imap <C-BS> <C-W>
@@ -173,7 +181,8 @@ syntax enable " enable syntax processing
 if has("gui_running")
     colorscheme badwolf
 else
-    colorscheme neon
+"     colorscheme neon
+    colorscheme badwolf
 endif
 " }}}
 
@@ -226,6 +235,8 @@ nmap <leader>f9 :set foldlevel=9<CR>>
 "}}} 
 
 " movement {{{
+" set mouse
+set mouse=a
 " move vertically by visual line
 noremap j gj
 noremap k gk
@@ -266,9 +277,9 @@ nmap <localleader><localleader> whxvExi()<esc>hp
 nnoremap <leader>u :GundoToggle<CR>
 "edit vimrc and load vimrc bindings
 map <leader>ev :vsp $MYVIMRC <CR>
-map <s-F9> :tabedit ~/.vim/vimrc<CR>
+map <F9> :tabedit ~/.vim/vimrc<CR>
 map <leader>wv :source $MYVIMRC <CR> :echom "NEW VIMRC LOADED!" <CR>
-map <F9> :so ~/.vimrc<CR> :echom "NEW VIMRC LOADED!" <CR>
+map <s-F9> :so ~/.vimrc<CR> :echom "NEW VIMRC LOADED!" <CR>
 
 let $rst='/home/mate/.vim/bundle/personal/plugin/rst.vim'
 " turn spelling on/off
@@ -337,10 +348,13 @@ augroup vimrc_autocmd
 "     autocmd FileType python set autoindent
     autocmd FileType python set smartindent
 
-    noremap <silent> <localleader>> I>>> <esc>
+    noremap <silent> <localleader>>
+                \ :<C-B>silent <C-E>s/^/<C-R>=escape('    >>> ', '\/')
+                \ <CR>/<CR>:nohlsearch<CR>
     noremap <silent> <localleader><
-                \:<C-B>silent <C-E>s/^\V<C-R>=escape('>>> ','\/')
-                \<CR>//e<CR>:nohlsearch<CR>
+                \ :<C-B>silent <C-E>s/^\V<C-R>=escape('    >>> ', ' \/')
+                \ <CR>//e<CR>:nohlsearch<CR>
+
 "     autocmd FileType python set textwidth=79 " PEP-8 Friendlynting
     autocmd FileType python map <localleader>n O# Note:<cr>"""<cr>"""<esc>O
     autocmd FileType python map <localleader>t O# TODO:<cr>"""<cr>"""<esc>O
