@@ -25,6 +25,7 @@ call pathogen#helptags()
 let g:pymode = 1
 let g:rainbow_active = 1
 let g:tex_conceal = ''
+let g:ycm_allow_changing_updatetime = 0
 
 " ensure that autocommands are only loaded once
 autocmd!
@@ -35,7 +36,7 @@ autocmd VimEnter * call Unmappings()
 function! Unmappings()
     " unmaps current color
     " select register to paste
-    nmap <leader>p :reg 0123456789<cr>
+    nmap <leader>p :reg <cr>
             \:call GetRegister()<cr>
     " unmaps current color status
     " replace the current word with yank
@@ -125,9 +126,13 @@ nmap <silent><f4> :SCROLLCOLOR<cr>
 filetype plugin indent on "load filetype-specific indent files
 set gfn=Monospace\ 12     "font
 set showcmd               "show command in bottom bar
+" rename screen title
+autocmd BufEnter * let &titlestring = ' ' . expand("%:t")             
+set title
 " detailed command bar
 set statusline=%F%m%r%h%w\ [TYPE=%Y\ %{&ff}]\ [%l/%L]\ (%p%%)\ 
             \\ %{SyntasticStatuslineFlag()}
+set updatetime=5000
 set history=200 "a longer command history
 set wildmenu    "visual autocomplete for command menu
 set lines=30 columns=85
@@ -142,6 +147,7 @@ onoremap <c-LeftMouse> <C-C><4-LeftMouse>
 noremap <c-LeftDrag> <LeftDrag>
 inoremap <c-LeftDrag> <LeftDrag>
 onoremap <c-LeftDrag> <C-C><LeftDrag>
+set hidden "allows switching between files without needing to save
 set splitright
 set splitbelow
 " copy into system clipboard = +
@@ -155,10 +161,10 @@ imap <C-del> <esc>lvedi
 set virtualedit=onemore "allows cursor beyond last char
 set scrolljump=7        "automatically scroll n when the cursor hits the edge
 set scrolloff=5         "keep the cursor n lines from the edge
+" set cursorline          "highlight current line
 " readability
 set formatoptions=1 lbr "linewrapping
 set number              "show line numbers
-set cursorline          "highlight current line
 set ttyfast
 set wrap
 set textwidth=0 wrapmargin=0
@@ -168,7 +174,6 @@ highlight OverLength ctermbg=red ctermfg=white guibg=#592929
 match OverLength /\%<73v.\%>72v/
 " searching
 set showmatch     "highlight matching {[()]}
-set synmaxcol=250 "fixes slow downs with really long lines
 set ruler
 set laststatus=2
 set ttimeoutlen=100
@@ -187,8 +192,12 @@ endif
 " }}}
 
 " spaces and tabs {{{
-syntax on                                "allows vim to highlight language
-                                         "syntax based on filetype
+syntax on                                   "allows vim to highlight language
+                                            "syntax based on filetype
+syntax sync minlines=256                    "speed up syntax. The trade off is
+                                            "there might be some inaccuracies with highlighting
+set synmaxcol=250 "fixes slow downs with really long lines
+
 
 set shiftwidth=4                         "indenting is 4 spaces
 set tabstop=4                            "number of visual spaces per TAB
@@ -213,7 +222,7 @@ set incsearch "search as characters are entered
 set hlsearch  "highlight matches
 set ignorecase
 set smartcase
-set hlsearch
+set regexpengine=1 "use earlier regex implementation. faster results
 " turn off search highlight
 noremap <leader>/ :nohlsearch<CR>
 " }}}
@@ -323,13 +332,13 @@ augroup vimrc_autocmd
     "
     " Commenting blocks of code.
 
-    autocmd FileType c,cpp,java,scala,cs  let b:comment_leader = '// '
-    autocmd FileType conf,fstab           let b:comment_leader = '# '
-    autocmd FileType tex                  let b:comment_leader = '% '
-    autocmd FileType mail                 let b:comment_leader = '> '
-    autocmd FileType vim                  let b:comment_leader = '" '
-    autocmd FileType sh,ruby              let b:comment_leader = '# '
-    autocmd FileType python               let b:comment_leader = '# '
+    autocmd FileType c,cpp,java,scala,cs let b:comment_leader = '// '
+    autocmd FileType conf,fstab,apache   let b:comment_leader = '# '
+    autocmd FileType tex                 let b:comment_leader = '% '
+    autocmd FileType mail                let b:comment_leader = '> '
+    autocmd FileType vim                 let b:comment_leader = '" '
+    autocmd FileType sh,ruby             let b:comment_leader = '# '
+    autocmd FileType python              let b:comment_leader = '# '
 
 
     noremap <silent> <localleader>c
@@ -364,18 +373,80 @@ augroup vimrc_autocmd
     autocmd FileType cpp map <localleader>a O//ATTENTION
     autocmd FileType cpp map <localleader>f O//FINISHED
 
-    autocmd FocusLost * :set number
-    autocmd FocusGained * :set relativenumber
+"     autocmd FocusLost * :set norelativenumber
+"     autocmd FocusGained * :set relativenumber
 " If you prefer the Omni-Completion tip window to close when a selection is
 " made, these lines close it on movement in insert mode or when leaving
 " insert mode
     autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
     autocmd InsertLeave * if pumvisible() == 0|pclose|endif
 
-    autocmd InsertEnter * :set number
-    autocmd InsertLeave * :set relativenumber
+"     autocmd InsertEnter * :set norelativenumber
+"     autocmd InsertLeave * :set relativenumber
+    autocmd CursorMoved * if LongEnough( "b:myTimer", 5, 5 ) | set nocursorline norelativenumber| endif
+    autocmd CursorHold * :set cursorline relativenumber   "updatetime=2000
+
+
     autocmd FocusGained * :redraw!
 
+"     autocmd InsertEnter * :set relativenumber
+"     autocmd InsertLeave * :set norelativenumber
+"     nnoremap <silent> v v:<C-u>set rnu<CR>gv
+"     nnoremap <silent> V V:<C-u>set rnu<CR>gv
+"     nnoremap <silent> <C-v> <C-v>:<C-u>set rnu<CR>gv
+"     vnoremap <Esc> <Esc>:set nornu<CR>
+
+
+" Returns true if at least delay seconds have elapsed since the last time this function was called, based on the time
+" contained in the variable "timer". The first time it is called, the variable is defined and the function returns
+" true.
+"
+" True means not zero.
+"
+" For example, to execute something no more than once every two seconds using a variable named "b:myTimer", do this:
+"
+" if LongEnough( "b:myTimer", 2 )
+"   <do the thing>
+" endif
+"
+" The optional 3rd parameter is the number of times to suppress the operation within the specified time and then let it
+" happen even though the required delay hasn't happened. For example:
+"
+" if LongEnough( "b:myTimer", 2, 5 )
+"   <do the thing>
+" endif
+"
+" Means to execute either every 2 seconds or every 5 calls, whichever happens first.
+function! LongEnough( timer, delay, ... )
+  let result = 0
+  let suppressionCount = 0
+  if ( exists( 'a:1' ) )
+    let suppressionCount = a:1
+  endif
+  " This is the first time we're being called.
+  if ( !exists( a:timer ) )
+    let result = 1
+  else
+    let timeElapsed = localtime() - {a:timer}
+    " If it's been a while...
+    if ( timeElapsed >= a:delay )
+      let result = 1
+    elseif ( suppressionCount > 0 )
+      let {a:timer}_callCount += 1
+      " It hasn't been a while, but the number of times we have been called has hit the suppression limit, so we activate
+      " anyway.
+      if ( {a:timer}_callCount >= suppressionCount )
+        let result = 1
+      endif
+    endif
+  endif
+  " Reset both the timer and the number of times we've been called since the last update.
+  if ( result )
+    let {a:timer} = localtime()
+    let {a:timer}_callCount = 0
+  endif
+  return result
+endfunction
 augroup END
 " }}} 
 " auto group md {{{

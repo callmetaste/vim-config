@@ -2,12 +2,12 @@
 install:	
 	echo "runtime vimrc" > ../.vimrc
 	git submodule update --init --recursive ./bundle
+	sudo apt-get update
+	sudo apt-get install python-pip python-dev
 	pip install instant-rst
 	sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
 	echo "deb http://download.mono-project.com/repo/debian wheezy main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list
-	sudo apt-get update
 	sudo apt-get install build-essential cmake mono-complete
-	cd ~/.vim/bundle/YouCompleteMe
-	./install.py --clang-completer --omnisharp-completer
+	./bundle/YouCompleteMe/install.py --clang-completer --omnisharp-completer
 	mv ../vim-config ../.vim
 
